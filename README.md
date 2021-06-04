@@ -9,10 +9,16 @@
 ## 安装
 
 ```
+dependencies:
+  flutter:
+    sdk: flutter
+  ………………
+  json_annotation: ^4.0.1
+
 dev_dependencies: 
-  json_transform_model: #最新版本
-  build_runner: ^1.0.0
-  json_serializable: ^2.0.0
+  json_transform_model: ^0.0.2
+  build_runner: ^2.0.4
+  json_serializable: ^4.1.3
 ```
 
 
@@ -132,7 +138,7 @@ part 'user.g.dart';
 
 @JsonSerializable()
 class User {
-    User(this.name,this.father,this.friends,this.keywords);
+    User(this.name,this.father,this.friends,this.keywords,this.age);
     
     String name;
     User father;

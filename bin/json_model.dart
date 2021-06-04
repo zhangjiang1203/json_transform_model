@@ -22,8 +22,11 @@ import 'package:json_annotation/json_annotation.dart';
 
 part '%s.g.dart';
 
-@JsonSerializable()
+// **************************************************************************
+// 代码生成不要手动修改
+// **************************************************************************
 
+@JsonSerializable()
 class %s {
     %s(
 %s

@@ -81,8 +81,12 @@ String replaceContent(String content,List<Object> params){
 
 String _getTemplateContent(){
   return '''
-  
-import '../models/index.dart';
+import 'index.dart';
+
+// **************************************************************************
+// 代码生成不要手动修改
+// **************************************************************************
+
 Type typeOf<T>() => T;
 class JsonConvert {
   static fromJson<T>(Map<String, dynamic> json) {
