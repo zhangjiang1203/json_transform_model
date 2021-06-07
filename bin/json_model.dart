@@ -39,11 +39,7 @@ class %s {
 }
 ''';
 
-main(){
-  run(['src=jsons']);
-}
-
-void run(List<String> args){
+main(List<String> args){
   String src = SRC;
   String dist = DIST;
   String tag = '\$';
