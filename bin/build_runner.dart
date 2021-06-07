@@ -22,8 +22,8 @@ import 'package:build_runner/src/entrypoint/runner.dart';
 import 'package:build_runner/src/logging/std_io_logging.dart';
 import 'package:build_runner_core/build_runner_core.dart';
 
-import 'clean.dart';
-import 'generate_build_script.dart';
+import 'src/clean.dart';
+import 'src/generate_build_script.dart';
 
 Future<void> run(List<String> args) async {
   // Use the actual command runner to parse the args and immediately print the

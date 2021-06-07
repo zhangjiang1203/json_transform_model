@@ -1,127 +1,85 @@
-//
-//  json_model
-//  flutter_json_to_model
-//
-//  Created by zhangjiang on 6/3/21 .
-//  Copyright © flutter_json_to_model. All rights reserved.
-
-//定义对应的模型文件路径解析，展示和对应的工具
 import 'dart:convert';
 import 'dart:io';
-import 'json_convert_genericity.dart';
-import 'package:path/path.dart' as path;
-import 'src/build_runner.dart' as build;
-import 'json_convert_genericity.dart' as convert;
 import 'package:args/args.dart';
+import 'package:path/path.dart' as path;
+import 'build_runner.dart' as br;
 
-const SRC="./jsons"; //JSON 目录
-const Dire="lib/models/";
-const tpl='''
-import 'package:json_annotation/json_annotation.dart';
-%t
+const tpl="import 'package:json_annotation/json_annotation.dart';\n%t\npart '%s.g.dart';\n\n@JsonSerializable()\nclass %s {\n    %s();\n\n    %s\n    factory %s.fromJson(Map<String,dynamic> json) => _\$%sFromJson(json);\n    Map<String, dynamic> toJson() => _\$%sToJson(this);\n}\n";
 
-part '%s.g.dart';
-
-// **************************************************************************
-// 代码生成不要手动修改
-// **************************************************************************
-
-@JsonSerializable()
-class %s {
-    %s(
-%s
-    );
-    
-    %s
-    
-    factory %s.fromJson(Map<String,dynamic> json) => _\$%sFromJson(json);
-    Map<String, dynamic> toJson() => _\$%sToJson(this);
-}
-''';
-
-main(List<String> args){
-  String src = SRC;
-  String dist = DIST;
+void main(List<String> args) {
+  String src = './jsons';
+  String dist = 'lib/models';
   String tag = '\$';
   var parser = new ArgParser();
-  parser.addOption('src', defaultsTo: src, callback: (v) => src = v!, help: "Specify the json directory.");
-  parser.addOption('dist', defaultsTo: dist, callback: (v) => dist = v!, help: "Specify the dist directory.");
-  parser.addOption('tag', defaultsTo: tag, callback: (v) => tag = v!, help: "Specify the tag ");
+  parser.addOption('src', defaultsTo: './jsons', callback: (v) => src = v ?? './jsons', help: "Specify the json directory.");
+  parser.addOption('dist', defaultsTo: 'lib/models', callback: (v) => dist = v ?? 'lib/models', help: "Specify the dist directory.");
+  parser.addOption('tag', defaultsTo: '\$', callback: (v) => tag = v ?? '\$', help: "Specify the tag ");
   parser.parse(args);
-  if (walk(src,dist,tag)) {
-    //生成jsonConvert文件
-    convert.walk(src,dist);
-    build.run(['build','--delete-conflicting-outputs']);
+  print(args);
+  if(walk(src, dist,tag)) {
+    //br.run(['clean']);
+    br.run(['build', '--delete-conflicting-outputs']);
   }
 }
 
-
 //遍历JSON目录生成模板
-bool walk(String srcDir, String distDir,String tag) {
+bool walk(String srcDir, String distDir, String tag ) {
   if(srcDir.endsWith("/")) srcDir=srcDir.substring(0, srcDir.length-1);
   if(distDir.endsWith("/")) distDir=distDir.substring(0, distDir.length-1);
+  print('源路径信息==' + srcDir);
   var src = Directory(srcDir);
   var list = src.listSync(recursive: true);
-  String indexFile = "";
+  String indexFile="";
   if(list.isEmpty) return false;
   if(!Directory(distDir).existsSync()){
     Directory(distDir).createSync(recursive: true);
   }
-
+//  var tpl=path.join(Directory.current.parent.path,"model.tpl");
+//  var template= File(tpl).readAsStringSync();
+//  File(path.join(Directory.current.parent.path,"model.tplx")).writeAsString(jsonEncode(template));
   File file;
   list.forEach((f) {
     if (FileSystemEntity.isFileSync(f.path)) {
       file = File(f.path);
-      var paths = path.basename(f.path).split(".");
-      String name = paths.first;
+      var paths=path.basename(f.path).split(".");
+      String name=paths.first;
       if(paths.last.toLowerCase()!="json"||name.startsWith("_")) return ;
       if(name.startsWith("_")) return;
       //下面生成模板
       var map = json.decode(file.readAsStringSync());
       //为了避免重复导入相同的包，我们用Set来保存生成的import语句。
-      var set = new Set<String>();
-      StringBuffer attrs = new StringBuffer();
-      StringBuffer initAttrs = new StringBuffer();
+      var set= new Set<String>();
+      StringBuffer attrs= new StringBuffer();
       (map as Map<String, dynamic>).forEach((key, v) {
         if(key.startsWith("_")) return ;
-
         if(key.startsWith("@")){
           if(key.startsWith("@import")){
             set.add(key.substring(1)+" '$v'");
             return;
           }
-
           attrs.write(key);
           attrs.write(" ");
           attrs.write(v);
           attrs.writeln(";");
-
-          //设置对应的属性
-          initAttrs.write("        this."+key+",\r\n");
         }else {
           attrs.write(getType(v, set, name, tag));
           attrs.write(" ");
           attrs.write(key);
           attrs.writeln(";");
-
-          initAttrs.write("        this."+key+",\r\n");
         }
         attrs.write("    ");
       });
-      String  className = name[0].toUpperCase()+name.substring(1);
-      //替换文本
-      var dist = format(tpl,[name,className,className,initAttrs.toString(),attrs.toString(),
+      String  className=name[0].toUpperCase()+name.substring(1);
+      var dist=format(tpl,[name,className,className,attrs.toString(),
         className,className,className]);
-
-      var _import = set.join(";\r\n");
-      _import += _import.isEmpty?"":";";
-      dist = dist.replaceFirst("%t",_import );
+      var _import=set.join(";\r\n");
+      _import+=_import.isEmpty?"":";";
+      dist=dist.replaceFirst("%t",_import );
       //将生成的模板输出
-      var p = f.path.replaceFirst(srcDir, distDir).replaceFirst(".json", ".dart");
-      //写入文件中
+      var p=f.path.replaceFirst(srcDir, distDir).replaceFirst(".json", ".dart");
       File(p)..createSync(recursive: true)..writeAsStringSync(dist);
-      var relative = p.replaceFirst(distDir+path.separator, "");
-      indexFile += "export '$relative' ; \n";
+      var relative=p.replaceFirst(distDir+path.separator, "");
+      indexFile+="export '$relative' ; \n";
     }
   });
   if(indexFile.isNotEmpty) {
@@ -129,7 +87,6 @@ bool walk(String srcDir, String distDir,String tag) {
   }
   return indexFile.isNotEmpty;
 }
-
 
 String changeFirstChar(String str, [bool upper=true] ){
   return (upper?str[0].toUpperCase():str[0].toLowerCase())+str.substring(1);
@@ -141,7 +98,7 @@ bool isBuiltInType(String type){
 
 //将JSON类型转为对应的dart类型
 String getType(v,Set<String> set,String current, tag){
-  current = current.toLowerCase();
+  current=current.toLowerCase();
   if(v is bool){
     return "bool";
   }else if(v is num){
@@ -152,14 +109,14 @@ String getType(v,Set<String> set,String current, tag){
     return "List";
   }else if(v is String){ //处理特殊标志
     if(v.startsWith("$tag[]")){
-      var type = changeFirstChar(v.substring(3),false);
-      if(type.toLowerCase() != current&&!isBuiltInType(type)) {
+      var type=changeFirstChar(v.substring(3),false);
+      if(type.toLowerCase()!=current&&!isBuiltInType(type)) {
         set.add('import "$type.dart"');
       }
       return "List<${changeFirstChar(type)}>";
 
     }else if(v.startsWith(tag)){
-      var fileName = changeFirstChar(v.substring(1),false);
+      var fileName=changeFirstChar(v.substring(1),false);
       if(fileName.toLowerCase()!=current) {
         set.add('import "$fileName.dart"');
       }
@@ -171,23 +128,6 @@ String getType(v,Set<String> set,String current, tag){
   }else{
     return "String";
   }
-}
-
-String getDefaultValueByType(String type,String className){
-  if (type == 'bool') {
-    return 'false';
-  }else if (type == 'num') {
-    return '0';
-  }else if (type == 'String') {
-    return "\"\"";
-  }else if (type == "List") {
-    return 'List.empty()';
-  }else if (type.contains("Map<")) {
-    return 'Map<String,dynamic>()';
-  }else if (type.contains("List<")) {
-    return 'List.empty()';
-  }
-  return "";
 }
 
 //替换模板占位符

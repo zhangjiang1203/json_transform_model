@@ -1,6 +1,6 @@
 # json_transform_model
 
-## 0.0.6
+## 0.0.7
 ### json 转model
 
 
