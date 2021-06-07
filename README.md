@@ -1,6 +1,6 @@
 # json_transform_model
 
-## 0.0.1
+## 0.0.6
 ### json 转model
 
 
@@ -16,7 +16,7 @@ dependencies:
   json_annotation: ^4.0.1
 
 dev_dependencies: 
-  json_transform_model: ^0.0.2
+  json_transform_model: #最新版本
   build_runner: ^2.0.4
   json_serializable: ^4.1.3
 ```
