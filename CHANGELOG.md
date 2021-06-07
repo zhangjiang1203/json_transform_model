@@ -1,8 +1,11 @@
-## 0.0.7
+## 0.0.8
 ### json 转model
 
 
 只用一行命令，直接将Json文件转为Dart model类。
+```
+flutter packages pub run json_transform_model
+```
 
 ## 安装
 

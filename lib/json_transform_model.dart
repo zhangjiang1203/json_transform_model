@@ -6,7 +6,6 @@
 //  Copyright © flutter_json_to_model. All rights reserved.
 
 //定义对应的模型文件路径解析，展示和对应的工具
-
 import 'dart:convert';
 import 'dart:io';
 import 'json_convert_genericity.dart';
@@ -40,8 +39,8 @@ class %s {
 }
 ''';
 
-main(){
-  run(['src=jsons']);
+main(List<String> args){
+  run(args);
 }
 
 void run(List<String> args){
@@ -49,14 +48,16 @@ void run(List<String> args){
   String dist = DIST;
   String tag = '\$';
   var parser = new ArgParser();
-  parser.addOption('src', defaultsTo: SRC, callback: (v) => src = v!, help: "Specify the json directory.");
-  parser.addOption('dist', defaultsTo: DIST, callback: (v) => dist = v!, help: "Specify the dist directory.");
-  parser.addOption('tag', defaultsTo: '\$', callback: (v) => tag = v!, help: "Specify the tag ");
+  parser.addOption('src', defaultsTo: src, callback: (v) => src = v!, help: "Specify the json directory.");
+  parser.addOption('dist', defaultsTo: dist, callback: (v) => dist = v!, help: "Specify the dist directory.");
+  parser.addOption('tag', defaultsTo: tag, callback: (v) => tag = v!, help: "Specify the tag ");
   parser.parse(args);
   if (walk(src,dist,tag)) {
     //生成jsonConvert文件
     convert.walk(src,dist);
+    print("开始生成对应的 .g.dart文件");
     build.run(['build','--delete-conflicting-outputs']);
+    print("生成对应的 .g.dart文件完成");
   }
 }
 
@@ -67,18 +68,19 @@ bool walk(String srcDir, String distDir,String tag) {
   if(distDir.endsWith("/")) distDir=distDir.substring(0, distDir.length-1);
   var src = Directory(srcDir);
   var list = src.listSync(recursive: true);
-  String indexFile="";
+  String indexFile = "";
   if(list.isEmpty) return false;
   if(!Directory(distDir).existsSync()){
     Directory(distDir).createSync(recursive: true);
   }
 
+  print("开始生成对应的JsonSerializable模板");
   File file;
   list.forEach((f) {
     if (FileSystemEntity.isFileSync(f.path)) {
       file = File(f.path);
-      var paths=path.basename(f.path).split(".");
-      String name=paths.first;
+      var paths = path.basename(f.path).split(".");
+      String name = paths.first;
       if(paths.last.toLowerCase()!="json"||name.startsWith("_")) return ;
       if(name.startsWith("_")) return;
       //下面生成模板
@@ -133,6 +135,8 @@ bool walk(String srcDir, String distDir,String tag) {
   if(indexFile.isNotEmpty) {
     File(path.join(distDir, "index.dart")).writeAsStringSync(indexFile);
   }
+
+  print("JsonSerializable模板生成完毕");
   return indexFile.isNotEmpty;
 }
 

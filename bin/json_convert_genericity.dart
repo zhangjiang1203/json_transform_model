@@ -27,6 +27,7 @@ void walk(String src,String dist) { //遍历JSON目录生成模板
   StringBuffer signalModelStr = new StringBuffer();
   StringBuffer listModelStr = new StringBuffer();
   StringBuffer indexStr = new StringBuffer();
+  print("开始生成模板泛型头文件");
   list.forEach((f) {
     if (FileSystemEntity.isFileSync(f.path)) {
       file = new File(f.path);
@@ -59,6 +60,7 @@ void walk(String src,String dist) { //遍历JSON目录生成模板
   content = replaceContent(content, [jsonTomodelStr.toString(),modelToJsonStr.toString(),signalModelStr.toString(),listModelStr.toString()]);
   //将生成的模板输出
   new File("$DIST/JsonConvert.dart").writeAsStringSync(content);
+  print("模板泛型头文件生成完毕");
 }
 
 String replaceContent(String content,List<Object> params){
