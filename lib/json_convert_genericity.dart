@@ -23,7 +23,7 @@ void walk(String src,String dist) { //遍历JSON目录生成模板
   List<FileSystemEntity> list = srcDire.listSync();
   File file;
   StringBuffer modelToJsonStr = new StringBuffer();
-  StringBuffer jsonTomodelStr = new StringBuffer();
+  StringBuffer jsonToModelStr = new StringBuffer();
   StringBuffer signalModelStr = new StringBuffer();
   StringBuffer listModelStr = new StringBuffer();
   StringBuffer indexStr = new StringBuffer();
@@ -35,9 +35,9 @@ void walk(String src,String dist) { //遍历JSON目录生成模板
       String className = name[0].toUpperCase() + name.substring(1);
       if (paths.last.toLowerCase() != "json" || name.startsWith("_")) return;
       if (name.startsWith("_")) return;
-      //设置jsonTomodel
-      jsonTomodelStr.write('    case $className:\r\n');
-      jsonTomodelStr.write("       return $className.fromJson(json) as T;\r\n");
+      //设置jsonToModel
+      jsonToModelStr.write('    case $className:\r\n');
+      jsonToModelStr.write("       return $className.fromJson(json) as T;\r\n");
 
       //设置modelToJson
       modelToJsonStr.write('    case $className:\r\n');
@@ -56,7 +56,7 @@ void walk(String src,String dist) { //遍历JSON目录生成模板
     }
   });
   var content = _getTemplateContent();
-  content = replaceContent(content, [jsonTomodelStr.toString(),modelToJsonStr.toString(),signalModelStr.toString(),listModelStr.toString()]);
+  content = replaceContent(content, [jsonToModelStr.toString(),modelToJsonStr.toString(),signalModelStr.toString(),listModelStr.toString()]);
   //将生成的模板输出
   new File("$DIST/JsonConvert.dart").writeAsStringSync(content);
 }

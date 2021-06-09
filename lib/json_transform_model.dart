@@ -81,29 +81,25 @@ bool walk(String srcDir, String distDir,String tag) {
       file = File(f.path);
       var paths = path.basename(f.path).split(".");
       String name = paths.first;
-      if(paths.last.toLowerCase()!="json"||name.startsWith("_")) return ;
+      if(paths.last.toLowerCase()!= "json"||name.startsWith("_")) return ;
       if(name.startsWith("_")) return;
       //下面生成模板
       var map = json.decode(file.readAsStringSync());
       //为了避免重复导入相同的包，我们用Set来保存生成的import语句。
-      var set= new Set<String>();
+      var set = new Set<String>();
       StringBuffer attrs= new StringBuffer();
       StringBuffer initAttrs = new StringBuffer();
       (map as Map<String, dynamic>).forEach((key, v) {
         if(key.startsWith("_")) return ;
-
-
         if(key.startsWith("@")){
           if(key.startsWith("@import")){
             set.add(key.substring(1)+" '$v'");
             return;
           }
-
           attrs.write(key);
           attrs.write(" ");
           attrs.write(v);
           attrs.writeln(";");
-
           //设置对应的属性
           initAttrs.write("        this."+key+",\r\n");
         }else {
@@ -116,20 +112,20 @@ bool walk(String srcDir, String distDir,String tag) {
         }
         attrs.write("    ");
       });
-      String  className=name[0].toUpperCase()+name.substring(1);
+      String className=name[0].toUpperCase()+name.substring(1);
       //替换文本
-      var dist=format(tpl,[name,className,className,initAttrs.toString(),attrs.toString(),
+      var dist = format(tpl,[name,className,className,initAttrs.toString(),attrs.toString(),
         className,className,className]);
 
-      var _import=set.join(";\r\n");
-      _import+=_import.isEmpty?"":";";
-      dist=dist.replaceFirst("%t",_import );
+      var _import = set.join(";\r\n");
+      _import += _import.isEmpty?"":";";
+      dist = dist.replaceFirst("%t",_import );
       //将生成的模板输出
-      var p=f.path.replaceFirst(srcDir, distDir).replaceFirst(".json", ".dart");
+      var p = f.path.replaceFirst(srcDir, distDir).replaceFirst(".json", ".dart");
       //写入文件中
       File(p)..createSync(recursive: true)..writeAsStringSync(dist);
-      var relative=p.replaceFirst(distDir+path.separator, "");
-      indexFile+="export '$relative' ; \n";
+      var relative = p.replaceFirst(distDir+path.separator, "");
+      indexFile += "export '$relative' ; \n";
     }
   });
   if(indexFile.isNotEmpty) {
@@ -142,7 +138,7 @@ bool walk(String srcDir, String distDir,String tag) {
 
 
 String changeFirstChar(String str, [bool upper=true] ){
-  return (upper?str[0].toUpperCase():str[0].toLowerCase())+str.substring(1);
+  return (upper?str[0].toUpperCase():str[0].toLowerCase()) + str.substring(1);
 }
 
 bool isBuiltInType(String type){
@@ -151,7 +147,7 @@ bool isBuiltInType(String type){
 
 //将JSON类型转为对应的dart类型
 String getType(v,Set<String> set,String current, tag){
-  current=current.toLowerCase();
+  current = current.toLowerCase();
   if(v is bool){
     return "bool";
   }else if(v is num){
@@ -162,15 +158,15 @@ String getType(v,Set<String> set,String current, tag){
     return "List";
   }else if(v is String){ //处理特殊标志
     if(v.startsWith("$tag[]")){
-      var type=changeFirstChar(v.substring(3),false);
-      if(type.toLowerCase()!=current&&!isBuiltInType(type)) {
+      var type = changeFirstChar(v.substring(3),false);
+      if(type.toLowerCase() != current&&!isBuiltInType(type)) {
         set.add('import "$type.dart"');
       }
       return "List<${changeFirstChar(type)}>";
 
     }else if(v.startsWith(tag)){
-      var fileName=changeFirstChar(v.substring(1),false);
-      if(fileName.toLowerCase()!=current) {
+      var fileName = changeFirstChar(v.substring(1),false);
+      if(fileName.toLowerCase()!= current) {
         set.add('import "$fileName.dart"');
       }
       return changeFirstChar(fileName);
