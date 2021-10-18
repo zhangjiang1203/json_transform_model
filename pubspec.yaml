@@ -1,6 +1,6 @@
 name: json_transform_model
 description: 根据json文件自动生成模型文件，并把模型文件归并到一起使用泛型去访问.
-version: 0.0.9
+version: 0.1.1
 homepage: https://github.com/zhangjiang1203/json_transform_model
 
 environment:
@@ -10,16 +10,16 @@ dependencies:
   flutter:
     sdk: flutter
 
-  json_annotation: ^4.0.1
+  json_annotation: ^4.1.0
   build_runner: ^2.0.4
   build_runner_core: ^7.0.0
-  json_serializable: ^4.1.3
-  args: ^2.1.1
-  build: ^2.0.2
+  json_serializable: ^5.0.2
+  args: ^2.3.0
+  build: ^2.1.0
   glob: ^2.0.1
-  logging: ^1.0.1
-  io: ^1.0.0
-  build_resolvers: ^2.0.3
+  logging: ^1.0.2
+  io: ^1.0.3
+  build_resolvers: ^2.0.4
   path: ^1.8.0
 
 dev_dependencies:

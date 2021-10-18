@@ -149,20 +149,20 @@ bool isBuiltInType(String type){
 String getType(v,Set<String> set,String current, tag){
   current=current.toLowerCase();
   if(v is bool){
-    return "bool";
+    return "bool?";
   }else if(v is num){
-    return "num";
+    return "num?";
   }else if(v is Map){
-    return "Map<String,dynamic>";
+    return "Map<String,dynamic>?";
   }else if(v is List){
-    return "List";
+    return "List?";
   }else if(v is String){ //处理特殊标志
     if(v.startsWith("$tag[]")){
       var type=changeFirstChar(v.substring(3),false);
       if(type.toLowerCase()!=current&&!isBuiltInType(type)) {
         set.add('import "$type.dart"');
       }
-      return "List<${changeFirstChar(type)}>";
+      return "List<${changeFirstChar(type)}>?";
 
     }else if(v.startsWith(tag)){
       var fileName=changeFirstChar(v.substring(1),false);
@@ -173,28 +173,28 @@ String getType(v,Set<String> set,String current, tag){
     }else if(v.startsWith("@")){
       return v;
     }
-    return "String";
+    return "String?";
   }else{
-    return "String";
+    return "String?";
   }
 }
 
-String getDefaultValueByType(String type,String className){
-  if (type == 'bool') {
-    return 'false';
-  }else if (type == 'num') {
-    return '0';
-  }else if (type == 'String') {
-    return "\"\"";
-  }else if (type == "List") {
-    return 'List.empty()';
-  }else if (type.contains("Map<")) {
-    return 'Map<String,dynamic>()';
-  }else if (type.contains("List<")) {
-    return 'List.empty()';
-  }
-  return "";
-}
+// String getDefaultValueByType(String type,String className){
+//   if (type == 'bool?') {
+//     return 'false';
+//   }else if (type == 'num?') {
+//     return '0';
+//   }else if (type == 'String?') {
+//     return "\"\"";
+//   }else if (type == "List?") {
+//     return 'List.empty()';
+//   }else if (type.contains("Map<")) {
+//     return 'Map<String,dynamic>()';
+//   }else if (type.contains("List<")) {
+//     return 'List.empty()';
+//   }
+//   return "";
+// }
 
 //替换模板占位符
 String format(String fmt, List<Object> params) {

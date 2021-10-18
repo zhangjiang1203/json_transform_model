@@ -4,7 +4,6 @@
 //
 //  Created by zhangjiang on 6/3/21 .
 //  Copyright © flutter_json_to_model. All rights reserved.
-
 import 'dart:async';
 import 'dart:io';
 

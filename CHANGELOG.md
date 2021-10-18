@@ -1,4 +1,4 @@
-## 0.0.9
+## 0.1.0
 ### json 转model
 
 
@@ -12,8 +12,8 @@ flutter packages pub run json_transform_model
 ```
 dev_dependencies: 
   json_transform_model: #最新版本
-  build_runner: ^1.0.0
-  json_serializable: ^2.0.0
+  build_runner: ^2.0.4
+  json_serializable: ^5.0.2
 ```
 
 
